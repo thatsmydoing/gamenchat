@@ -21,23 +21,6 @@ object Application extends Controller {
   }
 
   /**
-   * Display the chat room page.
-   */
-  def chatRoom(username: Option[String]) = Action { implicit request =>
-    username.filterNot(_.isEmpty).map { username =>
-      Ok(views.html.chatRoom(username))
-    }.getOrElse {
-      Redirect(routes.Application.index).flashing(
-        "error" -> "Please choose a valid username."
-      )
-    }
-  }
-
-  def chatRoomJs(username: String) = Action { implicit request =>
-    Ok(views.js.chatRoom(username))
-  }
-
-  /**
    * Handles the chat websocket.
    */
   def chat(username: String) = WebSocket.async[JsValue] { request  =>
