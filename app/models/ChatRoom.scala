@@ -88,8 +88,8 @@ object ChatRoom {
 }
 
 class ChatRoom extends Actor {
-  
-  var members = Set.empty[String]
+
+  var members = Map.empty[String, Concurrent.Channel[JsValue]]
   val (chatEnumerator, chatChannel) = Concurrent.broadcast[JsValue]
 
   def receive = {
@@ -98,8 +98,9 @@ class ChatRoom extends Actor {
       if(members.contains(username)) {
         sender ! CannotConnect("This username is already used")
       } else {
-        members = members + username
-        sender ! Connected(chatEnumerator)
+        val (personalEnumerator, personalChannel) = Concurrent.broadcast[JsValue]
+        members = members + (username -> personalChannel)
+        sender ! Connected(chatEnumerator.interleave(personalEnumerator))
         self ! NotifyJoin(username)
       }
     }
@@ -111,6 +112,10 @@ class ChatRoom extends Actor {
     case Talk(username, text) => {
       notifyAll("talk", username, text)
     }
+
+    case Tell(username, text, to) => {
+      notifyOne(to, "talk", username, text)
+    }
     
     case Quit(username) => {
       members = members - username
@@ -119,6 +124,21 @@ class ChatRoom extends Actor {
     
   }
   
+
+  def notifyOne(to: String, kind: String, user: String, text: String) {
+    val msg = JsObject(
+      Seq(
+        "kind" -> JsString(kind),
+        "user" -> JsString(user),
+        "message" -> JsString(text),
+        "members" -> JsArray(
+          members.keys.toList.map(JsString)
+        )
+      )
+    )
+    members(to).push(msg)
+  }
+
   def notifyAll(kind: String, user: String, text: String) {
     val msg = JsObject(
       Seq(
@@ -126,18 +146,19 @@ class ChatRoom extends Actor {
         "user" -> JsString(user),
         "message" -> JsString(text),
         "members" -> JsArray(
-          members.toList.map(JsString)
+          members.keys.toList.map(JsString)
         )
       )
     )
     chatChannel.push(msg)
   }
-  
+
 }
 
 case class Join(username: String)
 case class Quit(username: String)
 case class Talk(username: String, text: String)
+case class Tell(username: String, text: String, to: String)
 case class NotifyJoin(username: String)
 
 case class Connected(enumerator:Enumerator[JsValue])
