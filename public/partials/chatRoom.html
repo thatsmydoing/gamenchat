@@ -1,0 +1,29 @@
+<div ng-controller="ChatCtrl">
+  <div class="page-header">
+    <h1>Welcome to the chat room <small>You are chatting as {{service.username}}</small></h1>
+  </div>
+
+  <div id="onError" class="alert-message error">
+    <p>
+    <strong>Oops!</strong> <span></span>
+    </p>
+  </div>
+
+  <div class="row">
+    <div class="span10" id="main">
+      <div id="messages">
+        <div class="message {{message.kind}} {{message.user == service.username ? 'me' : ''}}" ng-repeat="message in service.messages">
+          <span>{{message.user}}</span>
+          <p>{{message.message}}</p>
+        </div>
+      </div>
+      <textarea ng-model="text" id="talk" ng-keypress="onType($event)"></textarea>
+    </div>
+    <div class="span4">
+      <h2>Members</h2>
+      <ul id="members">
+        <li ng-repeat="member in service.members">{{member}}</li>
+      </ul>
+    </div>
+  </div>
+</div>
