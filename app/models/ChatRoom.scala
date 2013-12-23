@@ -56,6 +56,8 @@ object ChatRoom {
 
 class ChatRoom extends Actor {
 
+  val tabooGame = Akka.system.actorOf(Props(classOf[TabooGame], self))
+
   var members = Map.empty[String, Concurrent.Channel[JsValue]]
   val (chatEnumerator, chatChannel) = Concurrent.broadcast[JsValue]
 
@@ -69,6 +71,7 @@ class ChatRoom extends Actor {
         members = members + (username -> personalChannel)
         sender ! Connected(chatEnumerator.interleave(personalEnumerator))
         self ! NotifyJoin(username)
+        tabooGame ! Join(username)
       }
     }
 
@@ -78,6 +81,7 @@ class ChatRoom extends Actor {
 
     case Talk(username, text) => {
       notifyAll("talk", username, text)
+      tabooGame ! Talk(username, text)
     }
 
     case Tell(username, text, to) => {
@@ -87,6 +91,7 @@ class ChatRoom extends Actor {
     case Quit(username) => {
       members = members - username
       notifyAll("quit", username, "has left the room")
+      tabooGame ! Quit(username)
     }
 
   }
