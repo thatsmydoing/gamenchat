@@ -6,14 +6,21 @@ function partial(template) {
 
 function ViewCtrl($scope, Connection) {
   $scope.service = Connection;
-  $scope.view = function(connected) {
-    if(connected) {
-      return partial("chatRoom");
-    }
-    else {
-      return partial("about");
-    }
+  $scope.partial = partial;
+  $scope.view = 'about';
+
+  $scope.nav = [
+    {partial: 'about', name: 'About'},
+    {partial: 'chatRoom', name: 'Chat'}
+  ];
+
+  $scope.setView = function(p) {
+    $scope.view = p;
   }
+
+  $scope.$on('ws:connected', function() {
+    $scope.view = 'chatRoom';
+  });
 }
 
 function LoginCtrl($scope, Connection) {

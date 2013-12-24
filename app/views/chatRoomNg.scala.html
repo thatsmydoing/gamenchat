@@ -8,13 +8,21 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
     </head>
-    <body>
+    <body ng-controller="ViewCtrl">
 
         <div class="topbar">
             <div class="fill">
-                <div class="container" ng-controller="LoginCtrl">
+                <div class="container">
                     <a class="brand">Game n' Chat</a>
+                    <div class="nav nav-collapse">
+                        <ul class="nav">
+                            <li ng-repeat="li in nav" class="{{li.partial == view ? 'active' : ''}}">
+                                <a ng-click="setView(li.partial)">{{li.name}}</a>
+                            </li>
+                        </ul>
+                    </div>
 
+                    <span ng-controller="LoginCtrl">
                     <p class="pull-right" ng-show="service.isConnected()">
                         Logged in as {{service.username}} —
                         <a ng-click="service.disconnect()">Disconnect</a>
@@ -24,14 +32,15 @@
                         <input id="username" name="username" class="input-small" type="text" ng-model="username" placeholder="Username">
                         <button class="btn" type="submit" ng-click="service.connect(username); username=''">Sign in</button>
                     </form>
+                    </span>
 
                 </div>
             </div>
         </div>
 
-        <div class="container" ng-controller="ViewCtrl">
+        <div class="container">
 
-            <div class="content" ng-include="view(service.isConnected())">
+            <div class="content" ng-include="partial(view)">
             </div>
 
             <footer>

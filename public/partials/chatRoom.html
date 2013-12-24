@@ -1,4 +1,13 @@
 <div ng-controller="ChatCtrl">
+<div ng-hide="service.isConnected()">
+  <div class="page-header">
+    <h1>Not connected</h1>
+  </div>
+  <div class="span10">
+    <p>Please sign in at the top bar.</p>
+  </div>
+</div>
+<div ng-show="service.isConnected()">
   <div class="page-header">
     <h1>Welcome <small>You are playing as {{service.username}}</small></h1>
   </div>
@@ -38,4 +47,5 @@
       </ul>
     </div>
   </div>
+</div>
 </div>
