@@ -142,7 +142,7 @@ class TabooGame(val chatActor: ActorRef) extends Actor {
       self ! NextCard
 
     case NextCard =>
-      val card = randomCard()
+      val card = Card.getRandom()
       roundActor ! card
 
       val message = Json.obj(
@@ -197,8 +197,6 @@ class TabooGame(val chatActor: ActorRef) extends Actor {
   }
 
   def player = round.get.team.player
-
-  def randomCard() = Card("test", Set("a", "b", "c", "d", "e"))
 
   def announceStatus(kind: String = "status", user: String = "*GM") {
     chatActor ! Announce(Json.obj(
