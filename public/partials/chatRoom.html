@@ -20,9 +20,19 @@
       <textarea ng-model="text" id="talk" ng-keypress="onType($event)"></textarea>
     </div>
     <div class="span4">
-      <h2>Members</h2>
-      <ul id="members">
-        <li ng-repeat="member in service.members">{{member}}</li>
+      <button class="btn" ng-show="service.startReady" ng-click="service.send('/start')">Start</button>
+      <h2>Card</h2>
+      <h3>{{service.card.word}}</h3>
+      <ul class="taboo">
+        <li ng-repeat="word in service.card.taboo">{{word}}</li>
+      </ul>
+      <h2>Team A</h2>
+      <ul class="members">
+        <li ng-repeat="member in service.teamA.members">{{member}}</li>
+      </ul>
+      <h2>Team B</h2>
+      <ul class="members">
+        <li ng-repeat="member in service.teamB.members">{{member}}</li>
       </ul>
     </div>
   </div>

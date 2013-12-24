@@ -3,8 +3,18 @@ package models
 import akka.actor._
 import scala.concurrent.duration._
 import play.api.libs.concurrent._
+import play.api.libs.json._
 import play.api.Play.current
 import play.api.libs.concurrent.Execution.Implicits._
+
+object Card {
+  implicit val writes = new Writes[Card] {
+    def writes(o: Card) = Json.obj(
+      "word" -> o.word,
+      "taboo" -> o.taboo
+    )
+  }
+}
 
 case class Card(word: String, taboo: Set[String]) {
 
@@ -22,6 +32,16 @@ case class Card(word: String, taboo: Set[String]) {
     text.toLowerCase.indexOf(word.toLowerCase) >= 0
   }
 
+}
+
+object Team {
+  implicit val writes = new Writes[Team] {
+    def writes(o: Team) = Json.obj(
+      "members" -> o.members,
+      "player" -> o.player,
+      "guessers" -> o.guessers
+    )
+  }
 }
 
 class Team {
@@ -53,23 +73,29 @@ class Team {
   def size = members.size
 }
 
+object Round {
+  implicit val writes = new Writes[Round] {
+    def writes(o: Round) = Json.obj(
+      "team" -> o.team,
+      "monitors" -> o.monitors
+    )
+  }
+}
+
 case class Round(team: Team, monitors: Set[String])
 
 case class Information(text: String)
 case class Guess(username: String, text: String)
 case object Pass
 case class Taboo(username: String)
+case object End
 
-case class Correct(username: String, card: Card)
-case class Invalid(card: Card)
-case class Passed(card: Card)
-case class Tabooed(username: String, card: Card)
+case class Score(kind: String, points: Int, card: Card, username: String = "")
 
 case object NextCard
 case object PrepRound
 case object StartRound
-case object End
-case class Points(points: Int)
+case class EndRound(points: Int, card: Option[Card])
 
 class TabooGame(val chatActor: ActorRef) extends Actor {
   var ready = false
@@ -90,6 +116,7 @@ class TabooGame(val chatActor: ActorRef) extends Actor {
       else {
         teamB.join(username)
       }
+      announceStatus("join", username)
       if(round.isEmpty) {
         self ! PrepRound
       }
@@ -97,9 +124,17 @@ class TabooGame(val chatActor: ActorRef) extends Actor {
     case Quit(username) =>
       teamA.leave(username)
       teamB.leave(username)
-      if(!round.isEmpty && (teamA.size < 2 || (currentTeam == teamB && teamB.size < 2))) {
-        roundActor ! End
+      announceStatus("quit", username)
+      if(teamA.size < 2 || currentTeam == teamB && teamB.size < 2) {
+        if(ready) {
+          ready = false
+        }
+        if(!round.isEmpty) {
+          roundActor ! End
+        }
       }
+
+    case Talk(username, "/status") => announceStatus()
 
     case Talk(username, text) => round match {
       case Some(round) =>
@@ -124,33 +159,26 @@ class TabooGame(val chatActor: ActorRef) extends Actor {
         }
     }
 
-    case Correct(username, card) =>
-      nextCard(username+" got it right!", card)
-
-    case Invalid(card) =>
-      nextCard("Uh-uh! "+player+" said a taboo word. Sorry.", card)
-
-    case Passed(card) =>
-      nextCard(player+" has passed.", card)
-
-    case Tabooed(username, card) =>
-      nextCard("Oh no! "+player+" apparently said a taboo word. :(", card)
-
-    case Points(points) =>
-      chatActor ! Talk("*GM", "The round is over. The team got "+points)
-      round = None
-      ready = false
-      self ! PrepRound
+    case Score(kind, points, card, user) =>
+      chatActor ! Announce(Json.obj(
+        "kind" -> "point",
+        "action" -> kind,
+        "card" -> card,
+        "user" -> user
+      ))
+      self ! NextCard
 
     case NextCard =>
       val card = randomCard()
       roundActor ! card
 
+      val message = Json.obj(
+        "kind" -> "card",
+        "card" -> card
+      )
+
       (round.get.monitors + player).foreach { user =>
-        chatActor ! Tell(
-          "*GM",
-          "The word is "+card.word+". The taboo words are: "+card.taboo.reduceLeft(_+" "+_),
-          user)
+        chatActor ! Tell(user, message)
       }
 
     case PrepRound =>
@@ -168,24 +196,44 @@ class TabooGame(val chatActor: ActorRef) extends Actor {
         }
         currentTeam.nextPlayer()
 
-        chatActor ! Talk("*GM", "Next round, the player will be "+currentTeam.player)
-        chatActor ! Tell("*GM", "Type /start to start the round", currentTeam.player)
+        chatActor ! Announce(Json.obj(
+          "kind" -> "roundReady",
+          "player" -> currentTeam.player
+        ))
       }
 
     case StartRound =>
       round = Some(Round(currentTeam, opposingTeam.members.toSet))
       roundActor = context.actorOf(Props[TabooRound])
       Akka.system.scheduler.scheduleOnce(1 minute, roundActor, End)
+      chatActor ! Announce(Json.obj(
+        "kind" -> "roundStart"
+      ))
       self ! NextCard
+
+    case EndRound(points, card) =>
+      chatActor ! Announce(Json.obj(
+        "kind" -> "roundEnd",
+        "points" -> points,
+        "card" -> card
+      ))
+      round = None
+      ready = false
+      self ! PrepRound
+
   }
 
   def player = round.get.team.player
 
   def randomCard() = Card("test", Set("a", "b", "c", "d", "e"))
 
-  def nextCard(message: String, oldCard: Card) = {
-    chatActor ! Talk("*GM", message+" The word was "+oldCard.word+".")
-    self ! NextCard
+  def announceStatus(kind: String = "status", user: String = "*GM") {
+    chatActor ! Announce(Json.obj(
+      "kind" -> kind,
+      "user" -> user,
+      "teamA" -> teamA,
+      "teamB" -> teamB
+    ))
   }
 
   self ! PrepRound
@@ -202,7 +250,7 @@ class TabooRound extends Actor {
     case Guess(username, text) => card.map { card =>
       if(card.isCorrect(text)) {
         points += 1
-        sender ! Correct(username, card)
+        sender ! Score("correct", points, card, username)
         this.card = None
       }
     }
@@ -210,25 +258,25 @@ class TabooRound extends Actor {
     case Information(text) => card.map { card =>
       if(card.isTaboo(text)) {
         points -= 1
-        sender ! Invalid(card)
+        sender ! Score("invalid", points, card)
         this.card = None
       }
     }
 
     case Pass => card.map { card =>
       points -= 1
-      sender ! Passed(card)
+      sender ! Score("pass", points, card)
       this.card = None
     }
 
     case Taboo(username) => card.map { card =>
       points -= 1
-      sender ! Tabooed(username, card)
+      sender ! Score("taboo", points, card)
       this.card = None
     }
 
     case End =>
-      sender ! Points(points)
+      sender ! EndRound(points, card)
       context.stop(self)
 
   }
