@@ -7,33 +7,6 @@ import play.api.libs.json._
 import play.api.Play.current
 import play.api.libs.concurrent.Execution.Implicits._
 
-object Card {
-  implicit val writes = new Writes[Card] {
-    def writes(o: Card) = Json.obj(
-      "word" -> o.word,
-      "taboo" -> o.taboo
-    )
-  }
-}
-
-case class Card(word: String, taboo: Set[String]) {
-
-  def isTaboo(text: String) = {
-    val lower = text.toLowerCase
-    def contains(word: String) = {
-      lower.indexOf(word.toLowerCase) >= 0
-    }
-
-    // check if text contains word or anything in taboo
-    (taboo + word).map(contains).foldLeft(false)(_ || _)
-  }
-
-  def isCorrect(text: String) = {
-    text.toLowerCase.indexOf(word.toLowerCase) >= 0
-  }
-
-}
-
 object Team {
   implicit val writes = new Writes[Team] {
     def writes(o: Team) = Json.obj(
