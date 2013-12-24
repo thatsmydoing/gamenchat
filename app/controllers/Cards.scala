@@ -26,4 +26,12 @@ object Cards extends Controller {
     )
   }
 
+  def dump = Action {
+    Ok(Json.toJson(Card.list()))
+  }
+
+  def random = Action {
+    Ok(Json.toJson(Card.getRandom()))
+  }
+
 }

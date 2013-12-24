@@ -28,16 +28,31 @@ object Card {
   }
 
   def getRandom() = DB.withConnection { implicit c =>
-    SQL("""
+    val list = SQL("""
       with rand as (
-        select * from words offset random() * (select count(*) from words) limit 1
+        select * from words offset floor(random() * (select count(*) from words)) limit 1
       )
       select rand.word as word, taboo.word as taboo from taboo, rand where word_id = rand.id
     """)
     .list(str("word") ~ str("taboo") map flatten)
-    .groupBy(_._1)
-    .map { case (word, taboos) => Card(word, taboos.map(_._2).toSet) }
-    .head
+
+    mapToCard(list).head
+  }
+
+  def list() = DB.withConnection { implicit c =>
+    val list = SQL("""
+      select words.word as word, taboo.word as taboo
+      from words left join taboo on word_id = words.id
+    """)
+    .list(str("word") ~ str("taboo") map flatten)
+
+    mapToCard(list)
+  }
+
+  def mapToCard(seq: Seq[(String, String)]) = {
+    seq.groupBy(_._1).map {
+      case (word, taboos) => Card(word, taboos.map(_._2).toSet)
+    }
   }
 }
 

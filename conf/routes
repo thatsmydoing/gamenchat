@@ -7,7 +7,9 @@ GET     /                                controllers.Application.index
 GET     /room/chat                       controllers.Application.chat(username)
 GET     /jsRoutes                        controllers.Application.javascriptRoutes
 
+GET     /cards                           controllers.Cards.dump
 POST    /cards                           controllers.Cards.add
+GET     /cards/random                    controllers.Cards.random
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file                    controllers.Assets.at(path="/public", file)
