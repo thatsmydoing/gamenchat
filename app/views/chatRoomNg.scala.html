@@ -3,7 +3,7 @@
 
 <html ng-app="taboo">
     <head>
-        <title>Websocket Chat-Room</title>
+        <title>Game n' Chat</title>
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
@@ -13,7 +13,7 @@
         <div class="topbar">
             <div class="fill">
                 <div class="container" ng-controller="LoginCtrl">
-                    <a class="brand">Websocket Chat-Room</a>
+                    <a class="brand">Game n' Chat</a>
 
                     <p class="pull-right" ng-show="service.isConnected()">
                         Logged in as {{service.username}} —
@@ -31,7 +31,7 @@
 
         <div class="container" ng-controller="ViewCtrl">
 
-            <div class="content" ng-include="partial('chatRoom')">
+            <div class="content" ng-include="view(service.isConnected())">
             </div>
 
             <footer>
@@ -43,7 +43,9 @@
         <script src="@routes.Application.javascriptRoutes" type="text/javascript"></script>
         <script src="@routes.Assets.at("components/jquery/jquery.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.at("components/angular/angular.min.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.at("javascripts/chatRoomNg.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/chatServices.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/tabooServices.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/main.js")" type="text/javascript"></script>
 
     </body>
 </html>

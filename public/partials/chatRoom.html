@@ -1,6 +1,6 @@
 <div ng-controller="ChatCtrl">
   <div class="page-header">
-    <h1>Welcome to the chat room <small>You are chatting as {{service.username}}</small></h1>
+    <h1>Welcome <small>You are playing as {{service.username}}</small></h1>
   </div>
 
   <div id="onError" class="alert-message error">
@@ -19,20 +19,22 @@
       </div>
       <textarea ng-model="text" id="talk" ng-keypress="onType($event)"></textarea>
     </div>
-    <div class="span4">
-      <button class="btn" ng-show="service.startReady" ng-click="service.send('/start')">Start</button>
-      <h2>Card</h2>
-      <h3>{{service.card.word}}</h3>
-      <ul class="taboo">
-        <li ng-repeat="word in service.card.taboo">{{word}}</li>
-      </ul>
+    <div class="span4" ng-controller="GameCtrl">
+      <button class="btn" ng-show="game.pendingRound" ng-click="game.startRound()">Start</button>
+      <div ng-show="game.card">
+        <h2>Card</h2>
+        <h3>{{game.card.word}}</h3>
+        <ul class="taboo">
+          <li ng-repeat="word in game.card.taboo">{{word}}</li>
+        </ul>
+      </div>
       <h2>Team A</h2>
       <ul class="members">
-        <li ng-repeat="member in service.teamA.members">{{member}}</li>
+        <li ng-repeat="member in game.teamA.members">{{member}}</li>
       </ul>
       <h2>Team B</h2>
       <ul class="members">
-        <li ng-repeat="member in service.teamB.members">{{member}}</li>
+        <li ng-repeat="member in game.teamB.members">{{member}}</li>
       </ul>
     </div>
   </div>

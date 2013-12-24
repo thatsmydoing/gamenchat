@@ -1,0 +1,96 @@
+angular.module('chatServices', [])
+.factory('Connection', function($rootScope, $timeout) {
+  var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket;
+  var chatSocket = null;
+
+  var service = {
+    username: '',
+    error: null,
+    messages: [],
+    isConnected: function() {
+      return this.username != '';
+    },
+    addListener: function(f) {
+      messageListeners.add(f);
+    }
+  };
+
+  function wrap(func) {
+    return function() {
+      var args = arguments;
+      $timeout(function() {
+        func.apply(null, args);
+      });
+    }
+  };
+
+  service.connect = function(username) {
+    chatSocket = new WS(jsRoutes.controllers.Application.chat(username).webSocketURL());
+    chatSocket.onmessage = wrap(function(event) {
+      var message = JSON.parse(event.data);
+      $rootScope.$broadcast('ws:message', message);
+    });
+    chatSocket.onopen = wrap(function() {
+      $rootScope.$broadcast('ws:connected', username);
+      service.username = username;
+    });
+    chatSocket.onclose = wrap(function() {
+      $rootScope.$broadcast('ws:disconnected');
+      service.username = '';
+    });
+  }
+
+  service.disconnect = function() {
+    chatSocket.close();
+    chatSocket = null;
+  }
+
+  service.send = function(message) {
+    chatSocket.send(JSON.stringify({text: message}));
+  }
+
+  return service;
+})
+.factory('Chat', function($rootScope, Connection) {
+  var service = {
+    username: '',
+    messages: [],
+    receive: function(message) {
+      if(arguments.length == 3) {
+        message = {
+          kind: arguments[0],
+          user: arguments[1],
+          message: arguments[2]
+        };
+      }
+      service.messages.push(message);
+    },
+    isConnected: Connection.isConnected,
+    send: Connection.send
+  };
+
+  $rootScope.$on('ws:connected', function(event, username) {
+    service.username = username;
+  });
+  $rootScope.$on('ws:message', function(event, message) {
+    if(message.kind == "talk") {
+      service.receive(message);
+    }
+    else if(message.kind == "join") {
+      service.receive("join", message.user, " has joined.");
+    }
+    else if(message.kind == "quit") {
+      service.receive("quit", message.user, " has left.");
+    }
+  });
+  $rootScope.$on('ws:disconnected', function() {
+    service.messages = [];
+    service.username = '';
+  });
+
+  if(Connection.isConnected()) {
+    service.username = Connection.username;
+  }
+
+  return service;
+})

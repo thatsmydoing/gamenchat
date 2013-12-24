@@ -108,6 +108,10 @@ body {
     background: #FFC;
 }
 
+.message.gm {
+    background: #D9FBE7;
+}
+
 .message.join, .message.quit {
     background: #D9E7FB;
 }
