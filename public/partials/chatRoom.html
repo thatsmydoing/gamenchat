@@ -31,6 +31,8 @@
     <div class="span4" ng-controller="GameCtrl">
       <button class="btn" ng-show="game.pendingRound" ng-click="game.startRound()">Start</button>
       <div ng-show="game.card">
+        <button class="btn" ng-show="game.isPlayer()" ng-click="game.pass()">Pass</button>
+        <button class="btn" ng-show="game.isMonitor()" ng-click="game.taboo()">Uh-uh!</button>
         <h2>Card</h2>
         <h3>{{game.card.word}}</h3>
         <ul class="taboo">

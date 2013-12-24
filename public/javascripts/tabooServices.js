@@ -7,6 +7,12 @@ angular.module('tabooServices', [])
   game.status = function() {
     Chat.send('/status');
   };
+  game.taboo = function() {
+    Chat.send('/taboo');
+  };
+  game.pass = function() {
+    Chat.send('/pass');
+  };
   game.roundStart = function() {
     game.pendingRound = false;
     game.startTime = new Date();
@@ -15,6 +21,13 @@ angular.module('tabooServices', [])
   game.roundEnd = function() {
     game.pendingRound = false;
     game.card = null;
+    game.monitors = [];
+  };
+  game.isMonitor = function() {
+    return game.monitors.indexOf(Chat.username) >= 0;
+  };
+  game.isPlayer = function() {
+    return game.player == Chat.username;
   };
 
   $rootScope.$on('ws:connected', init);
@@ -26,6 +39,8 @@ angular.module('tabooServices', [])
     game.card = null;
     game.points = 0;
     game.pendingRound = false;
+    game.player = '';
+    game.monitors = [];
     game.status();
   }
 
@@ -63,6 +78,8 @@ angular.module('tabooServices', [])
     else if(message.kind == "roundStart") {
       gmMessage("Start game!");
       game.roundStart();
+      game.player = message.round.team.player;
+      game.monitors = message.round.monitors;
     }
     else if(message.kind == "roundEnd") {
       if(message.card) {

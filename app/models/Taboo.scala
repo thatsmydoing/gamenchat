@@ -180,7 +180,8 @@ class TabooGame(val chatActor: ActorRef) extends Actor {
       roundActor = context.actorOf(Props[TabooRound])
       Akka.system.scheduler.scheduleOnce(1 minute, roundActor, End)
       chatActor ! Announce(Json.obj(
-        "kind" -> "roundStart"
+        "kind" -> "roundStart",
+        "round" -> round
       ))
       self ! NextCard
 
