@@ -1,6 +1,6 @@
 import play.Project._
 
-name := "websocket-chat"
+name := "gamenchat"
 
 version := "1.0"
 
