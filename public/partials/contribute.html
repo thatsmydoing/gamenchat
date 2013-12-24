@@ -1,0 +1,26 @@
+<div ng-controller="ContributeCtrl">
+  <div class="page-header">
+    <h1>Contribute</h1>
+  </div>
+  <div class="row">
+    <div class="span12" id="main">
+      <p>Help make the game! Contribute words and make the game better.</p>
+      <form ng-submit="submit()">
+        <input type="text" ng-model="card.word" id="inputWord" placeholder="Word">
+        <br>
+        <input type="text" ng-model="card.taboos[0]" placeholder="Taboo Word">
+        <br>
+        <input type="text" ng-model="card.taboos[1]" placeholder="Taboo Word">
+        <br>
+        <input type="text" ng-model="card.taboos[2]" placeholder="Taboo Word">
+        <br>
+        <input type="text" ng-model="card.taboos[3]" placeholder="Taboo Word">
+        <br>
+        <input type="text" ng-model="card.taboos[4]" placeholder="Taboo Word">
+        <hr>
+        <input class="btn btn-primary" type="submit" value="Submit">
+      </form>
+    </div>
+  </div>
+</div>
+

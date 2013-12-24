@@ -11,7 +11,8 @@ function ViewCtrl($scope, Connection) {
 
   $scope.nav = [
     {partial: 'about', name: 'About'},
-    {partial: 'chatRoom', name: 'Chat'}
+    {partial: 'chatRoom', name: 'Chat'},
+    {partial: 'contribute', name: 'Contribute'}
   ];
 
   $scope.setView = function(p) {
@@ -41,4 +42,23 @@ function ChatCtrl($scope, Chat) {
 
 function GameCtrl($scope, Taboo) {
   $scope.game = Taboo;
+}
+
+function ContributeCtrl($scope, $http) {
+  function init() {
+    $scope.card = {
+      word: '',
+      taboos: []
+    };
+  }
+
+  $scope.submit = function() {
+    $http.post(jsRoutes.controllers.Cards.add().url, $scope.card)
+      .then(function() {
+        alert("Thank you for your contribution!");
+        init();
+      });
+  }
+
+  init();
 }
