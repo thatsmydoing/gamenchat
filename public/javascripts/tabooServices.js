@@ -29,6 +29,10 @@ angular.module('tabooServices', [])
     game.status();
   }
 
+  if(Chat.isConnected()) {
+    init();
+  }
+
   function onmessage(event, message) {
     if(message.kind == "point") {
       var text = "";
