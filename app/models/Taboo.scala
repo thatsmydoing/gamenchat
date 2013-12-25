@@ -73,6 +73,7 @@ case class Round(
 case class Information(text: String)
 case class Guess(username: String, text: String)
 case object Pass
+case class Correct(username: String)
 case class Taboo(username: String)
 case object End
 
@@ -125,6 +126,7 @@ class TabooGame(val chatActor: ActorRef) extends Actor {
       case Some(round) =>
         if(username == round.team.player) text match {
           case "/pass" | "/p" => roundActor ! Pass
+          case "/correct" | "/c" => roundActor ! Correct(username)
           case text => roundActor ! Information(text)
         }
         else if(round.team.guessers(username)) {
@@ -132,6 +134,7 @@ class TabooGame(val chatActor: ActorRef) extends Actor {
         }
         else if(round.monitors(username)) text match {
           case "/taboo" | "/t" => roundActor ! Taboo(username)
+          case "/correct" | "/c" => roundActor ! Correct(username)
         }
 
       case None =>
@@ -249,6 +252,12 @@ class TabooRound extends Actor {
     case Pass => card.map { card =>
       points -= 1
       sender ! Score("pass", points, card)
+      this.card = None
+    }
+
+    case Correct(username) => card.map { card =>
+      points += 1
+      sender ! Score("correctp", points, card, username)
       this.card = None
     }
 

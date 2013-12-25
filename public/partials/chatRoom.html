@@ -36,6 +36,7 @@
       <div ng-if="game.roundRunning()">
         <button class="btn" ng-show="game.isPlayer()" ng-click="game.pass()">Pass</button>
         <button class="btn" ng-show="game.isMonitor()" ng-click="game.taboo()">Uh-uh!</button>
+        <button class="btn" ng-show="game.isMonitor() || game.isPlayer()" ng-click="game.correct()">Correct</button>
       </div>
       <div ng-show="game.card">
         <h2>Card</h2>

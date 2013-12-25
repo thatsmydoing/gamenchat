@@ -31,6 +31,9 @@ angular.module('tabooServices', [])
   game.taboo = function() {
     Chat.send('/taboo');
   };
+  game.correct = function() {
+    Chat.send('/correct');
+  };
   game.pass = function() {
     Chat.send('/pass');
   };
@@ -80,6 +83,9 @@ angular.module('tabooServices', [])
 
       if(message.action == "correct") {
         text = message.user + " got it!";
+      }
+      else if(message.action == "correctp") {
+        text = "Let's take "+message.user+"'s word that someone got it.";
       }
       else if(message.action == "invalid") {
         text = "Uh-uh! You said a taboo word.";
