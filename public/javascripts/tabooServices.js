@@ -1,11 +1,20 @@
 angular.module('tabooServices', [])
 .factory('Timer', function($interval) {
+  var promise;
   var service = {
     count: 0,
+    endTime: 0,
+    remainingTime: function() {
+      var ms = service.endTime - new Date().getTime();
+      return Math.round(Math.max(0, ms) / 1000);
+    },
     start: function(duration) {
+      if(service.remainingTime() > 0) $interval.cancel(promise);
+      var now = new Date().getTime();
+      service.endTime = now + duration * 1000;
       service.count = duration;
-      $interval(function() {
-        service.count -= 1;
+      promise = $interval(function() {
+        service.count = service.remainingTime();
       }, 1000, duration);
     }
   }
