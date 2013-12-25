@@ -1,5 +1,6 @@
 package models
 
+import util._
 import akka.actor._
 import scala.concurrent.duration._
 import play.api.libs.concurrent._
@@ -109,14 +110,13 @@ class TabooGame(val chatActor: ActorRef) extends Actor {
     case Quit(username) =>
       teamA.leave(username)
       teamB.leave(username)
+      val lackingMembers = teamA.size < 2 || currentTeam == teamB && teamB.size < 2
+      if(ready && lackingMembers) {
+        ready = false
+      }
       announceStatus("quit", username)
-      if(teamA.size < 2 || currentTeam == teamB && teamB.size < 2) {
-        if(ready) {
-          ready = false
-        }
-        if(!round.isEmpty) {
-          roundActor ! End
-        }
+      if(!round.isEmpty && lackingMembers) {
+        roundActor ! End
       }
 
     case Talk(username, "/status") => announceStatus()
@@ -215,6 +215,7 @@ class TabooGame(val chatActor: ActorRef) extends Actor {
     chatActor ! Announce(Json.obj(
       "kind" -> kind,
       "user" -> user,
+      "pendingPlayer" -> ifOpt(ready)(currentTeam.player),
       "round" -> round,
       "teamA" -> teamA,
       "teamB" -> teamB

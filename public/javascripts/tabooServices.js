@@ -124,6 +124,7 @@ angular.module('tabooServices', [])
     game.teamA = message.teamA;
     game.teamB = message.teamB;
     game.round = message.round;
+    game.pendingRound = (message.pendingPlayer == Chat.username);
     if(game.round) {
       Timer.start(game.round.remainingTime);
     }
