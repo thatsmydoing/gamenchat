@@ -45,6 +45,8 @@ function GameCtrl($scope, Taboo) {
 }
 
 function ContributeCtrl($scope, $http) {
+  $scope.submitting = false;
+
   function init() {
     $scope.card = {
       word: '',
@@ -53,10 +55,14 @@ function ContributeCtrl($scope, $http) {
   }
 
   $scope.submit = function() {
+    if($scope.submitting) return;
+    $scope.submitting = true;
     $http.post(jsRoutes.controllers.Cards.add().url, $scope.card)
       .then(function() {
+        $scope.submitting = false;
         alert("Thank you for your contribution!");
         init();
+        $('#inputWord').focus();
       });
   }
 
