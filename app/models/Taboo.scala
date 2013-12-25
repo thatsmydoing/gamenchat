@@ -144,6 +144,7 @@ class TabooGame(val chatActor: ActorRef) extends Actor {
       chatActor ! Announce(Json.obj(
         "kind" -> "point",
         "action" -> kind,
+        "points" -> points,
         "card" -> card,
         "user" -> user
       ))
