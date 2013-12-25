@@ -123,24 +123,20 @@ class TabooGame(val chatActor: ActorRef) extends Actor {
 
     case Talk(username, text) => round match {
       case Some(round) =>
-        if(username == round.team.player) {
-          if(text == "/pass") {
-            roundActor ! Pass
-          }
-          else {
-            roundActor ! Information(text)
-          }
+        if(username == round.team.player) text match {
+          case "/pass" | "/p" => roundActor ! Pass
+          case text => roundActor ! Information(text)
         }
         else if(round.team.guessers(username)) {
           roundActor ! Guess(username, text)
         }
-        else if(round.monitors(username) && text == "/taboo") {
-          roundActor ! Taboo(username)
+        else if(round.monitors(username)) text match {
+          case "/taboo" | "/t" => roundActor ! Taboo(username)
         }
 
       case None =>
-        if(username == currentTeam.player && text == "/start") {
-          self ! StartRound
+        if(username == currentTeam.player) text match {
+          case "/start" | "/s" => self ! StartRound
         }
     }
 
