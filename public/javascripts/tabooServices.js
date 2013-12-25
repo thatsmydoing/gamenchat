@@ -91,10 +91,10 @@ angular.module('tabooServices', [])
         text = "Uh-uh! You said a taboo word.";
       }
       else if(message.action == "pass") {
-        text = "Tsk tsk. You passed.";
+        text = "Tsk tsk. "+game.round.team.player+" passed.";
       }
       else if(message.action == "taboo") {
-        text = "Oh no! "+message.user+" has called you out.";
+        text = "Oh no! "+message.user+" has called "+game.round.team.player+" out.";
       }
 
       text += " The last word was "+message.card.word+".";
