@@ -50,7 +50,15 @@ class ApplicationSpec extends Specification {
     "Check the entire message" in {
       card.isTaboo("The word is test") must beTrue
       card.isTaboo("I am not allowed to say") must beTrue
-      card.isTaboo("swords") must beTrue
+      card.isTaboo("*words*") must beTrue
+      card.isTaboo("these/not/allowed") must beTrue
+    }
+
+    "Don't check parts of words" in {
+      card.isTaboo("area") must beFalse
+      card.isTaboo("knots") must beFalse
+      card.isTaboo("care") must beFalse
+      card.isTaboo("swords") must beFalse
     }
 
   }

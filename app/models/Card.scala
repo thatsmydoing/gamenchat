@@ -59,14 +59,15 @@ object Card {
 
 case class Card(word: String, taboo: Set[String]) {
 
+  lazy val tabooRegex = (taboo + word).map { word =>
+    ("\\b"+word.toLowerCase+"\\b").r
+  }
+
   def isTaboo(text: String) = {
     val lower = text.toLowerCase
-    def contains(word: String) = {
-      lower.indexOf(word.toLowerCase) >= 0
-    }
 
     // check if text contains word or anything in taboo
-    (taboo + word).map(contains).foldLeft(false)(_ || _)
+    tabooRegex.map(!_.findFirstIn(lower).isEmpty).foldLeft(false)(_ || _)
   }
 
   def isCorrect(text: String) = {
