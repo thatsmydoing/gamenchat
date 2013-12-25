@@ -1,5 +1,17 @@
 angular.module('tabooServices', [])
-.factory('Taboo', function($rootScope, Chat) {
+.factory('Timer', function($interval) {
+  var service = {
+    count: 0,
+    start: function(duration) {
+      service.count = duration;
+      $interval(function() {
+        service.count -= 1;
+      }, 1000, duration);
+    }
+  }
+  return service;
+})
+.factory('Taboo', function($rootScope, Chat, Timer) {
   var game = {};
   game.startRound = function() {
     Chat.send('/start');
@@ -15,11 +27,13 @@ angular.module('tabooServices', [])
   };
   game.roundStart = function() {
     game.pendingRound = false;
-    game.startTime = new Date();
+    game.roundStarted = true;
     game.points = 0;
+    game.timer.start(60);
   };
   game.roundEnd = function() {
     game.pendingRound = false;
+    game.roundStarted = false;
     game.card = null;
     game.monitors = [];
   };
@@ -39,8 +53,10 @@ angular.module('tabooServices', [])
     game.card = null;
     game.points = 0;
     game.pendingRound = false;
+    game.roundStarted = false;
     game.player = '';
     game.monitors = [];
+    game.timer = Timer;
     game.status();
   }
 
@@ -106,4 +122,4 @@ angular.module('tabooServices', [])
   }
 
   return game;
-})
+});
