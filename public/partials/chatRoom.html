@@ -31,7 +31,9 @@
     <div class="span4" ng-controller="GameCtrl">
       <button class="btn" ng-show="game.pendingRound" ng-click="game.startRound()">Start</button>
       <div ng-if="game.roundRunning()">
-        <h1>{{game.timer.count}}</h1>
+        <h2><ng-pluralize count="game.timer.count" when="{'0': 'Time\'s up!', 'one': '1 second', 'other': '{} seconds'}" /></h2>
+        <h2><ng-pluralize count="game.points" when="{'one': '1 point', 'other': '{} points'}" /></h2>
+        <hr>
       </div>
       <div ng-if="game.roundRunning()">
         <button class="btn" ng-show="game.isPlayer()" ng-click="game.pass()">Pass</button>
