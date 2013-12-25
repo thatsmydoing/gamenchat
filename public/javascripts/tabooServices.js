@@ -34,24 +34,26 @@ angular.module('tabooServices', [])
   game.pass = function() {
     Chat.send('/pass');
   };
-  game.roundStart = function() {
+  game.roundStart = function(round) {
     game.pendingRound = false;
-    game.roundStarted = true;
+    game.round = round;
     game.points = 0;
-    game.timer.start(60);
+    Timer.start(game.round.remainingTime);
   };
   game.roundEnd = function() {
     game.pendingRound = false;
-    game.roundStarted = false;
+    game.round = null;
     game.card = null;
-    game.monitors = [];
   };
   game.isMonitor = function() {
-    return game.monitors.indexOf(Chat.username) >= 0;
+    return game.round.monitors.indexOf(Chat.username) >= 0;
   };
   game.isPlayer = function() {
-    return game.player == Chat.username;
+    return game.round.team.player == Chat.username;
   };
+  game.roundRunning = function() {
+    return game.round != null;
+  }
 
   $rootScope.$on('ws:connected', init);
   $rootScope.$on('ws:message', onmessage);
@@ -63,8 +65,7 @@ angular.module('tabooServices', [])
     game.points = 0;
     game.pendingRound = false;
     game.roundStarted = false;
-    game.player = '';
-    game.monitors = [];
+    game.round = null;
     game.timer = Timer;
     game.status();
   }
@@ -102,9 +103,7 @@ angular.module('tabooServices', [])
     }
     else if(message.kind == "roundStart") {
       gmMessage("Start game!");
-      game.roundStart();
-      game.player = message.round.team.player;
-      game.monitors = message.round.monitors;
+      game.roundStart(message.round);
     }
     else if(message.kind == "roundEnd") {
       if(message.card) {
@@ -124,6 +123,10 @@ angular.module('tabooServices', [])
   function updateStatus(message) {
     game.teamA = message.teamA;
     game.teamB = message.teamB;
+    game.round = message.round;
+    if(game.round) {
+      Timer.start(game.round.remainingTime);
+    }
   }
 
   function gmMessage(message) {

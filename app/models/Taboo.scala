@@ -47,15 +47,27 @@ class Team {
 }
 
 object Round {
+  val DURATION = 60
+
   implicit val writes = new Writes[Round] {
     def writes(o: Round) = Json.obj(
       "team" -> o.team,
-      "monitors" -> o.monitors
+      "monitors" -> o.monitors,
+      "remainingTime" -> o.remainingTime
     )
   }
 }
 
-case class Round(team: Team, monitors: Set[String])
+case class Round(
+  team: Team,
+  monitors: Set[String],
+  startTime: Long = System.currentTimeMillis
+) {
+  def remainingTime = {
+    val sinceStart = (System.currentTimeMillis - startTime) / 1000
+    Math.max(0, Round.DURATION - sinceStart)
+  }
+}
 
 case class Information(text: String)
 case class Guess(username: String, text: String)
@@ -203,6 +215,7 @@ class TabooGame(val chatActor: ActorRef) extends Actor {
     chatActor ! Announce(Json.obj(
       "kind" -> kind,
       "user" -> user,
+      "round" -> round,
       "teamA" -> teamA,
       "teamB" -> teamB
     ))
