@@ -101,6 +101,18 @@ angular.module('tabooServices', [])
       gmMessage(text);
       game.points = message.points;
     }
+    else if(message.kind == "abuse") {
+      var text = "";
+
+      if(message.action == "correctp") {
+        text = message.user+" is abusing the correct button. Nobody has even tried to guess yet.";
+      }
+      else if(message.action == "taboo") {
+        text = message.user+" is abusing the taboo button. "+game.round.team.player+" hasn't even said anything yet.";
+      }
+
+      gmMessage(text);
+    }
     else if(message.kind == "roundReady") {
       gmMessage("Next round, the player will be "+message.player);
       if(message.player == Chat.username) {

@@ -77,6 +77,7 @@ case class Correct(username: String)
 case class Taboo(username: String)
 case object End
 
+case class Abuse(kind: String, username: String)
 case class Score(kind: String, points: Int, card: Card, username: String = "")
 
 case object NextCard
@@ -153,6 +154,13 @@ class TabooGame(val chatActor: ActorRef) extends Actor {
       ))
       self ! NextCard
 
+    case Abuse(kind, user) =>
+      chatActor ! Announce(Json.obj(
+        "kind" -> "abuse",
+        "action" -> kind,
+        "user" -> user
+      ))
+
     case NextCard =>
       val card = Card.getRandom()
       roundActor ! card
@@ -228,49 +236,62 @@ class TabooGame(val chatActor: ActorRef) extends Actor {
 class TabooRound extends Actor {
   var card: Option[Card] = None
   var points = 0
+  var guesses = 0
+  var infos = 0
 
   def receive = {
     case newCard: Card =>
       card = Some(newCard)
-
-    case Guess(username, text) => card.map { card =>
-      if(card.isCorrect(text)) {
-        points += 1
-        sender ! Score("correct", points, card, username)
-        this.card = None
-      }
-    }
-
-    case Information(text) => card.map { card =>
-      if(card.isTaboo(text)) {
-        points -= 1
-        sender ! Score("invalid", points, card)
-        this.card = None
-      }
-    }
-
-    case Pass => card.map { card =>
-      points -= 1
-      sender ! Score("pass", points, card)
-      this.card = None
-    }
-
-    case Correct(username) => card.map { card =>
-      points += 1
-      sender ! Score("correctp", points, card, username)
-      this.card = None
-    }
-
-    case Taboo(username) => card.map { card =>
-      points -= 1
-      sender ! Score("taboo", points, card)
-      this.card = None
-    }
+      guesses = 0
+      infos = 0
 
     case End =>
       sender ! EndRound(points, card)
       context.stop(self)
 
+    case other => card.map { card =>
+      other match {
+        case Guess(username, text) =>
+          guesses += 1
+          if(card.isCorrect(text)) {
+            point(1, "correct", username)
+          }
+
+        case Information(text) =>
+          infos += 1
+          if(card.isTaboo(text)) {
+            point(-1, "invalid")
+          }
+
+        case Pass => point(-1, "pass")
+
+        case Correct(username) =>
+          if(guesses == 0) {
+            abuse("correctp", username)
+          }
+          else {
+            point(1, "correctp", username)
+          }
+
+        case Taboo(username) =>
+          if(infos == 0) {
+            abuse("taboo", username)
+          }
+          else {
+            point(-1, "taboo", username)
+          }
+      }
+    }
+  }
+
+  def abuse(kind: String, username: String) = {
+    sender ! Abuse(kind, username)
+  }
+
+  def point(pointDiff: Int, kind: String, username: String = "") = card.map { card =>
+    points += pointDiff
+    sender ! Score(kind, points, card, username)
+    this.card = None
   }
 
 }
