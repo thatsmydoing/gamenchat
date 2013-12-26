@@ -48,7 +48,7 @@ class Team {
 }
 
 object Round {
-  val DURATION = 60
+  val DURATION = 120
 
   implicit val writes = new Writes[Round] {
     def writes(o: Round) = Json.obj(
