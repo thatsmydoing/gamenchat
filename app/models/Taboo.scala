@@ -136,11 +136,13 @@ class TabooGame(val chatActor: ActorRef) extends Actor {
         else if(round.monitors(username)) text match {
           case "/taboo" | "/t" => roundActor ! Taboo(username)
           case "/correct" | "/c" => roundActor ! Correct(username)
+          case _ => Unit
         }
 
       case None =>
         if(username == currentTeam.player) text match {
           case "/start" | "/s" => self ! StartRound
+          case _ => Unit
         }
     }
 
