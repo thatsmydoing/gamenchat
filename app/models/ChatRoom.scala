@@ -74,6 +74,12 @@ class ChatRoom extends Actor {
       }
     }
 
+    case Talk(username, "/ping") => {
+      self ! Tell(username, Json.obj(
+        "kind" -> "pong"
+      ))
+    }
+
     case Talk(username, text) => {
       if(!text.startsWith("/")) {
         self ! Announce(Json.obj(

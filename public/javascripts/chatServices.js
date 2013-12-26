@@ -1,7 +1,8 @@
 angular.module('chatServices', [])
-.factory('Connection', function($rootScope, $timeout) {
+.factory('Connection', function($rootScope, $timeout, $interval) {
   var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket;
   var chatSocket = null;
+  var ping = null;
 
   var service = {
     username: '',
@@ -28,15 +29,21 @@ angular.module('chatServices', [])
     chatSocket = new WS(jsRoutes.controllers.Application.chat(username).webSocketURL());
     chatSocket.onmessage = wrap(function(event) {
       var message = JSON.parse(event.data);
-      $rootScope.$broadcast('ws:message', message);
+      if(message.kind != "pong") {
+        $rootScope.$broadcast('ws:message', message);
+      }
     });
     chatSocket.onopen = wrap(function() {
       $rootScope.$broadcast('ws:connected', username);
       service.username = username;
+      ping = $interval(function() {
+        service.send('/ping');
+      }, 60000, 0, false);
     });
     chatSocket.onclose = wrap(function() {
       $rootScope.$broadcast('ws:disconnected');
       service.username = '';
+      $interval.cancel(ping);
     });
   }
 
