@@ -30,8 +30,13 @@ object Cards extends Controller {
     Ok(Json.toJson(Card.list()))
   }
 
+  var cardPool = CardPool.get()
+
   def random = Action {
-    Ok(Json.toJson(Card.getRandom()))
+    if(!cardPool.hasNext) {
+      cardPool = CardPool.get()
+    }
+    Ok(Json.toJson(cardPool.next()))
   }
 
 }

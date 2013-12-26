@@ -95,6 +95,7 @@ class TabooGame(val chatActor: ActorRef) extends Actor {
 
   var currentTeam: Team = teamB
   var opposingTeam: Team = teamA
+  var cardPool: CardPool = CardPool.get()
 
   def receive = {
     case Join(username) =>
@@ -164,7 +165,16 @@ class TabooGame(val chatActor: ActorRef) extends Actor {
       ))
 
     case NextCard =>
-      val card = Card.getRandom()
+      if(!cardPool.hasNext) {
+        cardPool = CardPool.get()
+        chatActor ! Announce(Json.obj(
+          "kind" -> "talk",
+          "user" -> "*GM",
+          "message" -> "And we're out of cards... Reshuffling the current set. You can help by contributing more cards though! *hint* *hint*"
+        ))
+      }
+
+      val card = cardPool.next()
       roundActor ! card
 
       val message = Json.obj(

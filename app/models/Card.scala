@@ -27,18 +27,6 @@ object Card {
     }
   }
 
-  def getRandom() = DB.withConnection { implicit c =>
-    val list = SQL("""
-      with rand as (
-        select * from words offset floor(random() * (select count(*) from words)) limit 1
-      )
-      select rand.word as word, taboo.word as taboo from taboo, rand where word_id = rand.id
-    """)
-    .list(str("word") ~ str("taboo") map flatten)
-
-    mapToCard(list).head
-  }
-
   def list() = DB.withConnection { implicit c =>
     val list = SQL("""
       select words.word as word, taboo.word as taboo
@@ -52,7 +40,7 @@ object Card {
   def mapToCard(seq: Seq[(String, String)]) = {
     seq.groupBy(_._1).map {
       case (word, taboos) => Card(word, taboos.map(_._2).toSet)
-    }
+    }.toList
   }
 }
 
@@ -74,4 +62,25 @@ case class Card(word: String, taboo: Set[String]) {
     text.toLowerCase.indexOf(word.toLowerCase) >= 0
   }
 
+}
+
+object CardPool {
+  import scala.util.Random
+
+  def get() = DB.withConnection { implicit c =>
+    val list = Card.list()
+    CardPool(Random.shuffle(list))
+  }
+}
+
+case class CardPool(list: List[Card]) {
+  var index = 0
+
+  def hasNext = list.size > index
+
+  def next() = {
+    val card = list(index)
+    index += 1
+    card
+  }
 }
