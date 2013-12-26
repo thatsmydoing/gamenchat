@@ -24,8 +24,8 @@ function ViewCtrl($scope, Connection) {
   });
 }
 
-function LoginCtrl($scope, Connection) {
-  $scope.service = Connection;
+function LoginCtrl($scope, Chat) {
+  $scope.service = Chat;
 }
 
 function ChatCtrl($scope, Chat) {
