@@ -3,7 +3,8 @@
     <h1>Contribute</h1>
   </div>
   <div class="row">
-    <div class="span12" id="main">
+    <div class="span10" id="main">
+      <h3>Add a card</h3>
       <p>Help make the game! Contribute words and make the game better.</p>
       <form ng-submit="submit()">
         <input type="text" ng-model="card.word" id="inputWord" placeholder="Word" required>
@@ -20,6 +21,13 @@
         <hr>
         <input ng-disabled="submitting" class="btn btn-primary" type="submit" value="{{submitting ? 'Submitting...' : 'Submit'}}">
       </form>
+    </div>
+    <div class="span4">
+      <h3>Help code</h3>
+      <p>
+        Want to help code instead? Fork the <a href="https://github.com/thatsmydoing/gamenchat">repo</a> or submit
+        an <a href="https://github.com/thatsmydoing/gamenchat/issues">issue</a>.
+      </p>
     </div>
   </div>
 </div>
