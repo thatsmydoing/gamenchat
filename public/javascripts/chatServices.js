@@ -30,7 +30,6 @@ angular.module('chatServices', [])
     chatSocket = new WS(jsRoutes.controllers.Application.chat(username).webSocketURL());
     chatSocket.onmessage = wrap(function(event) {
       var message = JSON.parse(event.data);
-      console.log(message);
       if(message.error) {
         service.error = message.error;
       }
