@@ -48,6 +48,9 @@ angular.module('tabooServices', [])
     game.round = null;
     game.card = null;
   };
+  game.isGuesser = function() {
+    return game.round.team.guessers.indexOf(Chat.username) >= 0;
+  };
   game.isMonitor = function() {
     return game.round.monitors.indexOf(Chat.username) >= 0;
   };
