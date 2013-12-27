@@ -1,3 +1,7 @@
+if(window.location.hostname == 'gamenchat.pleasantprogrammer.com' && window.location.port != 8000) {
+  window.location = 'http://gamenchat.pleasantprogrammer.com:8000';
+}
+
 angular.module('taboo', ['chatServices', 'tabooServices'])
 
 function partial(template) {
