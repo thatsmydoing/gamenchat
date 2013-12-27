@@ -4,7 +4,7 @@
 
 # Home page
 GET     /                                controllers.Application.index
-GET     /room/chat                       controllers.Application.chat(username)
+GET     /room/chat                       controllers.Application.chat(username, room)
 GET     /jsRoutes                        controllers.Application.javascriptRoutes
 
 GET     /cards                           controllers.Cards.dump

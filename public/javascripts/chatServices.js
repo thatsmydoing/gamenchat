@@ -1,5 +1,5 @@
 angular.module('chatServices', [])
-.factory('Connection', function($rootScope, $timeout, $interval) {
+.factory('Connection', function($rootScope, $timeout, $interval, $location) {
   var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket;
   var chatSocket = null;
   var ping = null;
@@ -25,9 +25,26 @@ angular.module('chatServices', [])
     }
   };
 
+  function makeid() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for( var i=0; i < 5; i++ )
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+  }
+
+  function getRoom() {
+    if(!$location.path()) {
+      $location.path(makeid());
+    }
+    return $location.path();
+  }
+
   service.connect = function(username) {
     service.error = null;
-    chatSocket = new WS(jsRoutes.controllers.Application.chat(username).webSocketURL());
+    chatSocket = new WS(jsRoutes.controllers.Application.chat(username, getRoom()).webSocketURL());
     chatSocket.onmessage = wrap(function(event) {
       var message = JSON.parse(event.data);
       if(message.error) {

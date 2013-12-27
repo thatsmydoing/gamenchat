@@ -19,19 +19,30 @@ object ChatRoom {
 
   implicit val timeout = Timeout(1 second)
 
-  lazy val default = Akka.system.actorOf(Props[ChatRoom])
+  lazy val roomMonitor = Akka.system.actorOf(Props[ChatRoom])
 
-  def join(username:String):scala.concurrent.Future[(Iteratee[JsValue,_],Enumerator[JsValue])] = {
+  var chatRooms = Map.empty[String, ActorRef]
 
-    (default ? Join(username)).map {
+  def closeRoom(room: String) = {
+    chatRooms -= room
+  }
+
+  def join(room: String, username:String):scala.concurrent.Future[(Iteratee[JsValue,_],Enumerator[JsValue])] = {
+
+    if(!chatRooms.keySet(room)) {
+      chatRooms += (room -> Akka.system.actorOf(Props(classOf[ChatRoom], room)))
+    }
+
+    val actor = chatRooms(room)
+    (actor ? Join(username)).map {
 
       case Connected(enumerator) =>
 
         // Create an Iteratee to consume the feed
         val iteratee = Iteratee.foreach[JsValue] { event =>
-          default ! Talk(username, (event \ "text").as[String])
+          actor ! Talk(username, (event \ "text").as[String])
         }.map { _ =>
-          default ! Quit(username)
+          actor ! Quit(username)
         }
 
         (iteratee,enumerator)
@@ -54,7 +65,7 @@ object ChatRoom {
 
 }
 
-class ChatRoom extends Actor {
+class ChatRoom(name: String) extends Actor {
 
   val tabooGame = Akka.system.actorOf(Props(classOf[TabooGame], self))
 
@@ -101,7 +112,14 @@ class ChatRoom extends Actor {
 
     case Quit(username) => {
       members = members - username
-      tabooGame ! Quit(username)
+      if(members.isEmpty) {
+        ChatRoom.closeRoom(name)
+        context.stop(tabooGame)
+        context.stop(self)
+      }
+      else {
+        tabooGame ! Quit(username)
+      }
     }
 
   }
