@@ -3,6 +3,11 @@
   <div class="page-header">
     <h1>Not connected</h1>
   </div>
+  <div ng-show="service.getError()" class="alert-message error">
+    <p>
+    <strong>Oops!</strong> <span>{{service.getError()}}</span>
+    </p>
+  </div>
   <div class="span10">
     <p>Please sign in at the top bar.</p>
   </div>
@@ -11,13 +16,6 @@
   <div class="page-header">
     <h1>Welcome <small>You are playing as {{service.username}}</small></h1>
   </div>
-
-  <div id="onError" class="alert-message error">
-    <p>
-    <strong>Oops!</strong> <span></span>
-    </p>
-  </div>
-
   <div class="row">
     <div class="span10" id="main">
       <div id="messages">

@@ -26,10 +26,14 @@ angular.module('chatServices', [])
   };
 
   service.connect = function(username) {
+    service.error = null;
     chatSocket = new WS(jsRoutes.controllers.Application.chat(username).webSocketURL());
     chatSocket.onmessage = wrap(function(event) {
       var message = JSON.parse(event.data);
       console.log(message);
+      if(message.error) {
+        service.error = message.error;
+      }
       if(message.kind != "pong") {
         $rootScope.$broadcast('ws:message', message);
       }
@@ -72,6 +76,9 @@ angular.module('chatServices', [])
         };
       }
       service.messages.push(message);
+    },
+    getError: function() {
+      return Connection.error;
     },
     connect: Connection.connect,
     disconnect: Connection.disconnect,
