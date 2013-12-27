@@ -3,7 +3,50 @@
     <h1>About</h1>
   </div>
   <div class="row">
-    <div class="span10" id="main">
+    <div class="span10">
+      <h2>Taboo</h2>
+      <p>
+        Taboo is a party game for around 4 to 10 people split into 2 teams. Each
+        round, a player from a team becomes the <em>giver</em> and the rest of the
+        team become <em>guessers</em>. The opposing team act as <em>monitors</em>.
+      </p>
+      <p>
+        The <em>giver</em> is given a card containing a word and 5 taboo words. The
+        giver must somehow tell the <em>guessers</em> about the word without mentioning
+        the word itself or any of the 5 taboo words. The <em>monitors</em> act as
+        judges to see if any of the words said are not allowed.
+      </p>
+      <p>
+        If a guesser gets the word right, the team earns a point. If the giver says
+        any taboo word, the team loses a point. The giver may also choose to pass
+        and the team also loses a point. The giver is then given another card and
+        this continues until the round time runs out.
+      </p>
+      <h3>Additional notes</h3>
+      <p>
+        When there are enough players, the giver is announced and he can start the
+        game by pressing the Start button. Normally, taboo rounds are 1 minute long,
+        but we extend it to 2 minutes because of the time it takes to type things.
+      </p>
+      <p>
+        The system can rudimentarily act as a monitor itself. If the giver types out
+        any of the taboo words verbatim, the system immediately calls taboo on those.
+        It can also check if the word was guessed correctly assuming it was spelled
+        correctly. For all other cases, we will rely on the monitors and the giver
+        to act in good faith.
+      </p>
+      <p>
+        To facilitate faster playing, there are some command you can just type in:
+      </p>
+      <ul>
+        <li><code>/s</code> - Start the round</li>
+        <li><code>/p</code> - Pass</li>
+        <li><code>/c</code> - Correct (someone got the word)</li>
+        <li><code>/t</code> - Taboo</li>
+      </ul>
+    </div>
+    <div class="span4" id="main">
+      <h2>What is this?</h2>
       <p>
         Hi! This is just a side project I made where you can play Taboo online.
         I liked playing it with my friends during our Christmas party and I wanted
