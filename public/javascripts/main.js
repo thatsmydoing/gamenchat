@@ -48,7 +48,7 @@ function GameCtrl($scope, Taboo) {
   $scope.game = Taboo;
 }
 
-function ContributeCtrl($scope, $http) {
+function ContributeCtrl($scope, $http, $timeout) {
   $scope.submitting = false;
 
   function init() {
@@ -64,7 +64,10 @@ function ContributeCtrl($scope, $http) {
     $http.post(jsRoutes.controllers.Cards.add().url, $scope.card)
       .then(function() {
         $scope.submitting = false;
-        alert("Thank you for your contribution!");
+        $scope.thanks = true;
+        $timeout(function() {
+          $scope.thanks = false;
+        }, 3000);
         init();
         $('#inputWord').focus();
       });
