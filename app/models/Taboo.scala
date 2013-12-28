@@ -49,6 +49,7 @@ class Team {
 
 object Round {
   val DURATION = 120
+  val GRACE_PERIOD = 2
 
   implicit val writes = new Writes[Round] {
     def writes(o: Round) = Json.obj(
@@ -250,12 +251,14 @@ class TabooRound extends Actor {
   var points = 0
   var guesses = 0
   var infos = 0
+  var graceEnd = 0L
 
   def receive = {
     case newCard: Card =>
       card = Some(newCard)
       guesses = 0
       infos = 0
+      graceEnd = System.currentTimeMillis + Round.GRACE_PERIOD * 1000
 
     case End =>
       sender ! EndRound(points, card)
@@ -271,7 +274,7 @@ class TabooRound extends Actor {
 
         case Information(text) =>
           infos += 1
-          if(card.isTaboo(text)) {
+          if(card.isTaboo(text) && !inLeeway) {
             point(-1, "invalid")
           }
 
@@ -281,7 +284,7 @@ class TabooRound extends Actor {
           if(guesses == 0) {
             abuse("correctp", username)
           }
-          else {
+          else if(!inLeeway) {
             point(1, "correctp", username)
           }
 
@@ -289,12 +292,14 @@ class TabooRound extends Actor {
           if(infos == 0) {
             abuse("taboo", username)
           }
-          else {
+          else if(!inLeeway) {
             point(-1, "taboo", username)
           }
       }
     }
   }
+
+  def inLeeway = System.currentTimeMillis < graceEnd
 
   def abuse(kind: String, username: String) = {
     sender ! Abuse(kind, username)
