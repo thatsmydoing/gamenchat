@@ -41,7 +41,7 @@ function ChatCtrl($scope, Chat, Connection) {
   $scope.chat = Chat;
 
   $scope.onType = function(event) {
-    if(event.keyCode == 13) {
+    if($scope.text != '' && event.keyCode == 13) {
       Chat.send($scope.text);
       $scope.text = '';
       event.originalEvent.preventDefault();

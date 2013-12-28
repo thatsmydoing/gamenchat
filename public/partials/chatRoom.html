@@ -21,7 +21,7 @@
           <p>{{message.message}}</p>
         </div>
       </div>
-      <textarea ng-model="text" id="talk" ng-keypress="onType($event)"></textarea>
+      <input type="text" ng-model="text" id="talk" ng-keypress="onType($event)">
     </div>
     <div class="span4" ng-controller="GameCtrl">
       <button class="btn" ng-show="game.pendingRound" ng-click="game.startRound()">Start</button>
