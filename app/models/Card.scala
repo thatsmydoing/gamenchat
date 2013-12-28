@@ -14,6 +14,10 @@ object Card {
     )
   }
 
+  def size = DB.withConnection { implicit c =>
+    SQL("select count(*) from words").single(long("count"))
+  }
+
   def add(card: Card) = DB.withTransaction { implicit c =>
     val id = SQL("insert into words values (default, {word})")
       .on('word -> card.word)

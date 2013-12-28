@@ -20,6 +20,7 @@ object ChatRoom {
   implicit val timeout = Timeout(1 second)
 
   var chatRooms = Map.empty[String, ActorRef]
+  var connectionCount = 0
 
   def closeRoom(room: String) = {
     chatRooms -= room
@@ -35,11 +36,13 @@ object ChatRoom {
     (actor ? Join(username)).map {
 
       case Connected(enumerator) =>
+        connectionCount += 1
 
         // Create an Iteratee to consume the feed
         val iteratee = Iteratee.foreach[JsValue] { event =>
           actor ! Talk(username, (event \ "text").as[String])
         }.map { _ =>
+          connectionCount -= 1
           actor ! Quit(username)
         }
 

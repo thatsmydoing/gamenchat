@@ -6,6 +6,7 @@
 GET     /                                controllers.Application.index
 GET     /room/chat                       controllers.Application.chat(username, room)
 GET     /jsRoutes                        controllers.Application.javascriptRoutes
+GET     /stats                           controllers.Application.stats
 
 GET     /cards                           controllers.Cards.dump
 POST    /cards                           controllers.Cards.add

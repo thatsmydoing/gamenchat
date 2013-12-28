@@ -17,6 +17,14 @@ object Application extends Controller {
     Ok(views.html.index())
   }
 
+  def stats = Action {
+    Ok(Json.obj(
+      "rooms" -> ChatRoom.chatRooms.keySet,
+      "activeConnections" -> ChatRoom.connectionCount,
+      "totalCards" -> Card.size
+    ))
+  }
+
   /**
    * Handles the chat websocket.
    */
