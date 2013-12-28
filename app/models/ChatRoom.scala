@@ -19,8 +19,6 @@ object ChatRoom {
 
   implicit val timeout = Timeout(1 second)
 
-  lazy val roomMonitor = Akka.system.actorOf(Props[ChatRoom])
-
   var chatRooms = Map.empty[String, ActorRef]
 
   def closeRoom(room: String) = {
