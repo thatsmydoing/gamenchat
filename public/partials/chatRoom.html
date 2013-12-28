@@ -3,9 +3,9 @@
   <div class="page-header">
     <h1>Not connected</h1>
   </div>
-  <div ng-show="service.getError()" class="alert-message error">
+  <div ng-show="service.error" class="alert-message error">
     <p>
-    <strong>Oops!</strong> <span>{{service.getError()}}</span>
+    <strong>Oops!</strong> <span>{{service.error}}</span>
     </p>
   </div>
   <div class="span10">
@@ -19,7 +19,7 @@
   <div class="row">
     <div class="span10" id="main">
       <div id="messages">
-        <div class="message {{message.kind}} {{message.user == service.username ? 'me' : ''}}" ng-repeat="message in service.messages">
+        <div class="message {{message.kind}} {{message.user == chat.username ? 'me' : ''}}" ng-repeat="message in chat.messages">
           <span>{{message.user}}</span>
           <p>{{message.message}}</p>
         </div>

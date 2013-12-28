@@ -76,7 +76,7 @@ angular.module('tabooServices', [])
     game.status();
   }
 
-  if(Chat.isConnected()) {
+  if(Chat.username != '') {
     init();
   }
 

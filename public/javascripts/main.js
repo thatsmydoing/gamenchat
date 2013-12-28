@@ -28,12 +28,13 @@ function ViewCtrl($scope, Connection) {
   });
 }
 
-function LoginCtrl($scope, Chat) {
-  $scope.service = Chat;
+function LoginCtrl($scope, Connection) {
+  $scope.service = Connection;
 }
 
-function ChatCtrl($scope, Chat) {
-  $scope.service = Chat;
+function ChatCtrl($scope, Chat, Connection) {
+  $scope.service = Connection;
+  $scope.chat = Chat;
 
   $scope.onType = function(event) {
     if(event.keyCode == 13) {

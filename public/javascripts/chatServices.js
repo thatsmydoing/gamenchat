@@ -8,8 +8,9 @@ angular.module('chatServices', [])
     username: '',
     error: null,
     messages: [],
+    status: 'disconnected',
     isConnected: function() {
-      return this.username != '';
+      return this.status == 'connected';
     },
     addListener: function(f) {
       messageListeners.add(f);
@@ -43,7 +44,9 @@ angular.module('chatServices', [])
   }
 
   service.connect = function(username) {
+    if(service.status != 'disconnected') return;
     service.error = null;
+    service.status = 'connecting';
     chatSocket = new WS(jsRoutes.controllers.Application.chat(username, getRoom()).webSocketURL());
     chatSocket.onmessage = wrap(function(event) {
       var message = JSON.parse(event.data);
@@ -56,6 +59,7 @@ angular.module('chatServices', [])
     });
     chatSocket.onopen = wrap(function() {
       $rootScope.$broadcast('ws:connected', username);
+      service.status = 'connected';
       service.username = username;
       ping = $interval(function() {
         service.send('/ping');
@@ -63,6 +67,7 @@ angular.module('chatServices', [])
     });
     chatSocket.onclose = wrap(function() {
       $rootScope.$broadcast('ws:disconnected');
+      service.status = 'disconnected';
       service.username = '';
       $interval.cancel(ping);
     });
@@ -93,12 +98,6 @@ angular.module('chatServices', [])
       }
       service.messages.push(message);
     },
-    getError: function() {
-      return Connection.error;
-    },
-    connect: Connection.connect,
-    disconnect: Connection.disconnect,
-    isConnected: Connection.isConnected,
     send: Connection.send
   };
 
