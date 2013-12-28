@@ -210,7 +210,7 @@ class TabooGame(val chatActor: ActorRef) extends Actor {
     case StartRound =>
       round = Some(Round(currentTeam, opposingTeam.members.toSet))
       roundActor = context.actorOf(Props[TabooRound])
-      Akka.system.scheduler.scheduleOnce(1 minute, roundActor, End)
+      Akka.system.scheduler.scheduleOnce(Round.DURATION seconds, roundActor, End)
       chatActor ! Announce(Json.obj(
         "kind" -> "roundStart",
         "round" -> round
