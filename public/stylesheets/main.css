@@ -115,3 +115,9 @@ body {
 .message.join, .message.quit {
     background: #D9E7FB;
 }
+
+#login {
+    text-align: center;
+    padding-top: 100px;
+    height: 300px;
+}

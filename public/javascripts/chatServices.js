@@ -9,6 +9,9 @@ angular.module('chatServices', [])
     error: null,
     messages: [],
     status: 'disconnected',
+    hasRoom: function() {
+      return $location.path() != '';
+    },
     isConnected: function() {
       return this.status == 'connected';
     },

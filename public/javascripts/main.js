@@ -8,10 +8,14 @@ function partial(template) {
   return jsRoutes.controllers.Assets.at('partials/'+template+'.html').url;
 }
 
-function ViewCtrl($scope, Connection) {
+function ViewCtrl($scope, $location, Connection) {
   $scope.service = Connection;
   $scope.partial = partial;
   $scope.view = 'about';
+
+  if($location.path()) {
+    $scope.view = 'chatRoom';
+  }
 
   $scope.nav = [
     {partial: 'about', name: 'About'},

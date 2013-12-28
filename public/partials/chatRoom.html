@@ -1,22 +1,19 @@
 <div ng-controller="ChatCtrl">
-<div ng-hide="service.isConnected()">
   <div class="page-header">
-    <h1>Not connected</h1>
+    <h1 ng-show="service.isConnected()">Welcome <small>You are playing as {{service.username}}</small></h1>
+    <h1 ng-hide="service.isConnected()">Welcome <small>login to play</small></h1>
   </div>
-  <div ng-show="service.error" class="alert-message error">
-    <p>
-    <strong>Oops!</strong> <span>{{service.error}}</span>
-    </p>
+  <div ng-if="!service.isConnected()" class="row">
+    <div id="login" class="offset4 span6">
+      <form ng-show="service.status == 'disconnected'">
+        <input id="username" name="username" class="input-small" type="text" ng-model="username" placeholder="Username">
+        <br>
+        <br>
+        <button class="btn" type="submit" ng-click="service.connect(username); username=''">{{service.hasRoom() ? 'Join Room' : 'Create New Room'}}</button>
+      </form>
+    </div>
   </div>
-  <div class="span10">
-    <p>Please sign in at the top bar.</p>
-  </div>
-</div>
-<div ng-show="service.isConnected()">
-  <div class="page-header">
-    <h1>Welcome <small>You are playing as {{service.username}}</small></h1>
-  </div>
-  <div class="row">
+  <div ng-if="service.isConnected()" class="row">
     <div class="span10" id="main">
       <div id="messages">
         <div class="message {{message.kind}} {{message.user == chat.username ? 'me' : ''}}" ng-repeat="message in chat.messages">
@@ -58,5 +55,4 @@
       </ul>
     </div>
   </div>
-</div>
 </div>
