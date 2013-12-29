@@ -18,6 +18,13 @@ object Card {
     SQL("select count(*) from words").single(long("count"))
   }
 
+  def exists(word: String) = DB.withConnection { implicit c =>
+    SQL("select * from words where lower(word) = lower({word})")
+      .on('word -> word)
+      .list(str("word"))
+      .nonEmpty
+  }
+
   def add(card: Card) = DB.withTransaction { implicit c =>
     val id = SQL("insert into words values (default, {word})")
       .on('word -> card.word)

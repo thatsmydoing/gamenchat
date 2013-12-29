@@ -55,12 +55,29 @@ function GameCtrl($scope, Taboo) {
 
 function ContributeCtrl($scope, $http, $timeout) {
   $scope.submitting = false;
+  $scope.exists = false;
 
   function init() {
     $scope.card = {
       word: '',
       taboos: []
     };
+  }
+
+  function check() {
+    $http.get(jsRoutes.controllers.Cards.exists($scope.card.word).url)
+      .then(function(data) {
+        $scope.exists = data.data.exists;
+      });
+  }
+
+  var promise = null;
+
+  $scope.check = function() {
+    if(promise != null) {
+      $timeout.cancel(promise);
+    }
+    promise = $timeout(check, 200);
   }
 
   $scope.submit = function() {

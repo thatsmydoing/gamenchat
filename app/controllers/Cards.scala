@@ -26,6 +26,13 @@ object Cards extends Controller {
     )
   }
 
+  def exists(word: String) = Action {
+    Ok(Json.obj(
+      "word" -> word,
+      "exists" -> Card.exists(word)
+    ))
+  }
+
   def dump = Action {
     Ok(Json.toJson(Card.list()))
   }

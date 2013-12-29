@@ -10,7 +10,8 @@
         original work only. Don't just blindly copy a card from any of the Taboo games.
       </p>
       <form ng-submit="submit()">
-        <input type="text" ng-model="card.word" id="inputWord" placeholder="Word" required>
+        <input type="text" ng-model="card.word" id="inputWord" placeholder="Word" ng-change="check()" required>
+        <span ng-show="exists">We already have this word</span>
         <br>
         <input type="text" ng-model="card.taboos[0]" placeholder="Taboo Word" required>
         <br>

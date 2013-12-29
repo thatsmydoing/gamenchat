@@ -11,6 +11,7 @@ GET     /stats                           controllers.Application.stats
 GET     /cards                           controllers.Cards.dump
 POST    /cards                           controllers.Cards.add
 GET     /cards/random                    controllers.Cards.random
+GET     /cards/exists                    controllers.Cards.exists(word: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file                    controllers.Assets.at(path="/public", file)
