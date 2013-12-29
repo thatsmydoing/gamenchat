@@ -61,6 +61,23 @@ class ApplicationSpec extends Specification {
       card.isTaboo("swords") must beFalse
     }
 
+    val compoundCard = Card("test card", Set("much words", "such test", "very pass"))
+
+    "Check compound taboo word variations" in {
+      compoundCard.isTaboo("test") must beTrue
+      compoundCard.isTaboo("card") must beTrue
+      compoundCard.isTaboo("much") must beTrue
+      compoundCard.isTaboo("such") must beTrue
+      compoundCard.isTaboo("words") must beTrue
+      compoundCard.isTaboo("very") must beTrue
+      compoundCard.isTaboo("pass") must beTrue
+
+      compoundCard.isTaboo("testcard") must beTrue
+      compoundCard.isTaboo("muchwords") must beTrue
+      compoundCard.isTaboo("suchtest") must beTrue
+      compoundCard.isTaboo("verypass") must beTrue
+    }
+
   }
 
   "Team" should {

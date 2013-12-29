@@ -51,8 +51,12 @@ object Card {
 
 case class Card(word: String, taboo: Set[String]) {
 
-  lazy val tabooRegex = (taboo + word).map { word =>
+  lazy val tabooRegex = (taboo + word).flatMap(compoundWords).map { word =>
     ("\\b"+word.toLowerCase+"\\b").r
+  }
+
+  def compoundWords(text: String): Seq[String] = {
+    text.split(" ") :+ text.replace(" ", "")
   }
 
   def isTaboo(text: String) = {
