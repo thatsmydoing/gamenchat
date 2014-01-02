@@ -4,9 +4,10 @@
     <h1 ng-hide="service.isConnected()">Welcome <small>login to play</small></h1>
   </div>
   <div ng-show="!service.isConnected()" class="row">
-    <div id="login" class="offset4 span6">
-      <form ng-show="service.status == 'disconnected'">
-        <input id="username" name="username" class="input-small" type="text" ng-model="username" placeholder="Username">
+    <div class="alert alert-danger" ng-show="service.error"><strong>Oops!</strong> {{service.error}}.</div>
+    <div id="login">
+      <form class="form-inline" ng-show="service.status == 'disconnected'">
+        <input id="username" name="username" class="form-control" type="text" ng-model="username" placeholder="Username">
         <br>
         <br>
         <button class="btn" type="submit" ng-click="service.connect(username); username=''">{{service.hasRoom() ? 'Join Room' : 'Create New Room'}}</button>
@@ -14,29 +15,31 @@
     </div>
   </div>
   <div ng-show="service.isConnected()" class="row">
-    <div class="span10" id="main">
+    <div class="col-md-9" id="main">
       <div id="messages">
-        <div class="message {{message.kind}} {{message.user == chat.username ? 'me' : ''}}" ng-repeat="message in chat.messages">
-          <span>{{message.user}}</span>
-          <p>{{message.message}}</p>
-        </div>
+      <table>
+        <tr class="message {{message.kind}} {{message.user == chat.username ? 'me' : ''}}" ng-repeat="message in chat.messages">
+          <td class="user">{{message.user}}</td>
+          <td>{{message.message}}</td>
+        </tr>
+      </table>
       </div>
-      <input type="text" ng-model="text" id="talk" ng-keypress="onType($event)">
+      <input type="text" class="form-control" ng-model="text" id="talk" ng-keypress="onType($event)">
     </div>
-    <div class="span4" ng-controller="GameCtrl">
-      <button class="btn" ng-show="game.pendingRound" ng-click="game.startRound()">Start</button>
+    <div class="col-md-3" ng-controller="GameCtrl">
+      <button class="btn btn-primary" ng-show="game.pendingRound" ng-click="game.startRound()">Start</button>
       <div ng-if="game.roundRunning()">
         <h2><ng-pluralize count="game.timer.count" when="{'0': 'Time\'s up!', 'one': '1 second', 'other': '{} seconds'}" /></h2>
         <h2><ng-pluralize count="game.points" when="{'one': '1 point', 'other': '{} points'}" /></h2>
         <hr>
       </div>
       <div ng-if="game.roundRunning()">
-        <h3 ng-show="game.isPlayer()">you are the giver</button>
-        <h3 ng-show="game.isMonitor()">you are a monitor</button>
-        <h3 ng-show="game.isGuesser()">you are a guesser</button>
-        <button class="btn" ng-show="game.isPlayer()" ng-click="game.pass()">Pass</button>
-        <button class="btn" ng-show="game.isMonitor()" ng-click="game.taboo()">Uh-uh!</button>
-        <button class="btn" ng-show="game.isMonitor() || game.isPlayer()" ng-click="game.correct()">Correct</button>
+        <h3 ng-show="game.isPlayer()">you are the giver</h3>
+        <h3 ng-show="game.isMonitor()">you are a monitor</h3>
+        <h3 ng-show="game.isGuesser()">you are a guesser</h3>
+        <button class="btn btn-warning" ng-show="game.isPlayer()" ng-click="game.pass()">Pass</button>
+        <button class="btn btn-danger" ng-show="game.isMonitor()" ng-click="game.taboo()">Uh-uh!</button>
+        <button class="btn btn-success" ng-show="game.isMonitor() || game.isPlayer()" ng-click="game.correct()">Correct</button>
       </div>
       <div ng-show="game.card">
         <h2>Card</h2>

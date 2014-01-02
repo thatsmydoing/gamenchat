@@ -4,6 +4,12 @@ if(window.location.hostname == 'gamenchat.pleasantprogrammer.com' && window.loca
 
 angular.module('taboo', ['chatServices', 'tabooServices'])
 
+function resizeMessages() {
+  $("#messages").css('height', $(window).height() - 300);
+}
+
+window.onresize = resizeMessages;
+
 function partial(template) {
   return jsRoutes.controllers.Assets.at('partials/'+template+'.html').url;
 }
@@ -13,7 +19,7 @@ function ViewCtrl($scope, $location, Connection) {
   $scope.partial = partial;
   $scope.view = 'about';
 
-  if($location.path()) {
+  if($location.path() && $(window).width() >= 768) {
     $scope.view = 'chatRoom';
   }
 
@@ -36,17 +42,35 @@ function LoginCtrl($scope, Connection) {
   $scope.service = Connection;
 }
 
-function ChatCtrl($scope, Chat, Connection) {
+function ChatCtrl($scope, Chat, Connection, $timeout) {
   $scope.service = Connection;
   $scope.chat = Chat;
 
+  resizeMessages();
+  var scrollLock = true;
+
   $scope.onType = function(event) {
     if($scope.text != '' && event.keyCode == 13) {
+      scrollLock = true;
       Chat.send($scope.text);
       $scope.text = '';
       event.originalEvent.preventDefault();
     }
   }
+
+  function scroll() {
+    var actualHeight = $("#messages")[0].scrollHeight;
+    $("#messages").scrollTop(actualHeight);
+  }
+
+  $("#messages").scroll(function() {
+    var maxScroll = this.scrollHeight - $(this).height();
+    scrollLock = (this.scrollTop == maxScroll);
+  });
+
+  $scope.$on('chat:message', function() {
+    if(scrollLock) $timeout(scroll, 100)
+  });
 }
 
 function GameCtrl($scope, Taboo) {

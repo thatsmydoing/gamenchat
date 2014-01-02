@@ -100,6 +100,7 @@ angular.module('chatServices', [])
         };
       }
       service.messages.push(message);
+      $rootScope.$broadcast('chat:message', message);
     },
     send: Connection.send
   };

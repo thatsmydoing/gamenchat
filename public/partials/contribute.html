@@ -3,35 +3,39 @@
     <h1>Contribute</h1>
   </div>
   <div class="row">
-    <div class="span10" id="main">
+    <div class="col-md-8" id="main">
       <h3>Add a card</h3>
       <p>
         Help make the game! Contribute words and make the game better. Also, please
         original work only. Don't just blindly copy a card from any of the Taboo games.
       </p>
-      <form ng-submit="submit()">
-        <input type="text" ng-model="card.word" id="inputWord" placeholder="Word" ng-change="check()" required>
-        <span ng-show="exists">We already have this word</span>
-        <br>
-        <input type="text" ng-model="card.taboos[0]" placeholder="Taboo Word" required>
-        <br>
-        <input type="text" ng-model="card.taboos[1]" placeholder="Taboo Word" required>
-        <br>
-        <input type="text" ng-model="card.taboos[2]" placeholder="Taboo Word" required>
-        <br>
-        <input type="text" ng-model="card.taboos[3]" placeholder="Taboo Word" required>
-        <br>
-        <input type="text" ng-model="card.taboos[4]" placeholder="Taboo Word" required>
-        <hr>
+      <form id="cardForm" role="form" ng-submit="submit()">
+        <div class="form-group">
+          <label for="inputWord">Word</label>
+          <input type="text" class="form-control" ng-model="card.word" id="inputWord" placeholder="Word" ng-change="check()" required>
+          <span ng-show="exists">We already have this word</span>
+        </div>
+        <div class="form-group">
+          <label>Taboo Words</label>
+          <input type="text" class="form-control" ng-model="card.taboos[0]" placeholder="Taboo Word" required>
+          <input type="text" class="form-control" ng-model="card.taboos[1]" placeholder="Taboo Word" required>
+          <input type="text" class="form-control" ng-model="card.taboos[2]" placeholder="Taboo Word" required>
+          <input type="text" class="form-control" ng-model="card.taboos[3]" placeholder="Taboo Word" required>
+          <input type="text" class="form-control" ng-model="card.taboos[4]" placeholder="Taboo Word" required>
+        </div>
         <input ng-disabled="submitting" class="btn btn-primary" type="submit" value="{{submitting ? 'Submitting...' : 'Submit'}}">
         <span ng-show="thanks">Thank you!</span>
       </form>
     </div>
-    <div class="span4">
+    <div class="col-md-4 sidebar">
       <h3>Help code</h3>
       <p>
         Want to help code instead? Fork the <a href="https://github.com/thatsmydoing/gamenchat">repo</a> or submit
         an <a href="https://github.com/thatsmydoing/gamenchat/issues">issue</a>.
+      </p>
+      <h3>Help design</h3>
+      <p>
+        Yes, it's bootstrap. Not even custom colors. If you like it, maybe you can make it look nicer.
       </p>
     </div>
   </div>
