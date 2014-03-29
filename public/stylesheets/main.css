@@ -1,3 +1,7 @@
+.ng-cloak {
+    display: none;
+}
+
 .container {
     max-width: 820px;
 }
