@@ -50,7 +50,12 @@ angular.module('chatServices', [])
     if(service.status != 'disconnected') return;
     service.error = null;
     service.status = 'connecting';
-    chatSocket = new WS(jsRoutes.controllers.Application.chat(username, getRoom()).webSocketURL());
+
+    var url = jsRoutes.controllers.Application.chat(username, getRoom()).webSocketURL();
+    if(window.location.hostname == "gamenchat.pleasantprogrammer.com" && window.location.port == "") {
+      url = url.replace("gamenchat.pleasantprogrammer.com", "$&:8000");
+    }
+    chatSocket = new WS(url);
     chatSocket.onmessage = wrap(function(event) {
       var message = JSON.parse(event.data);
       if(message.error) {

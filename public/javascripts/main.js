@@ -1,5 +1,5 @@
-if(window.location.hostname == 'gamenchat.pleasantprogrammer.com' && window.location.port != 8000) {
-  window.location = 'http://gamenchat.pleasantprogrammer.com:8000';
+if(window.location.hostname == 'gamenchat.pleasantprogrammer.com' && window.location.port == "8000") {
+  window.location = 'http://gamenchat.pleasantprogrammer.com';
 }
 
 angular.module('taboo', ['chatServices', 'tabooServices'])
