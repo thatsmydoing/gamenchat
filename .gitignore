@@ -4,3 +4,4 @@ project/target
 target
 tmp
 public/components
+node_modules
