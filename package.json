@@ -10,7 +10,9 @@
   "license": "MIT",
   "dependencies": {
     "cyclejs": "^0.24.1",
+    "lodash": "^3.10.0",
     "node-libs-browser": "^0.5.2",
+    "rx-dom": "^6.0.0",
     "webpack": "^1.10.1",
     "webpack-dev-server": "^1.10.1"
   },

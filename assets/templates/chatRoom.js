@@ -1,55 +1,58 @@
 var h = require('cyclejs').h;
+var util = require('../util');
+var cx = util.classNames;
 
-function renderLogin() {
-  var disconnected = true;
-  var error = null;
-  var hasRoom = false;
+function renderLogin(props) {
+  var disconnected = props.status === 'disconnected';
+  var error = props.error;
+  var hasRoom = props.room != null;
   return (
     h("div.row", [
-      error && h("div.alert.alert-danger", [
-        h("strong", [ "Oops!" ]), error + "."
-      ]),
+      error ? h("div.alert.alert-danger", [
+        h("strong", [ "Oops!" ]), ' ' + error + "."
+      ]) : null,
       h("div#login", [
-        disconnected && h("form.form-inline#login-form", [
+        disconnected ? h("form.form-inline#login-form", [
           h("input#username.form-control", {
               "name": "username",
               "type": "text",
-              "ng-model": "username",
               "placeholder": "Username"
           }),
           h("br"),
           h("br"),
-          h("button.btn", {
-              "type": "submit",
-              "ng-click": "service.connect(username); username=''"
-          }, [ hasRoom ? 'Join Room' : 'Create New Room' ])
-        ])
+          h("button.btn", { "type": "submit" }, [ hasRoom ? 'Join Room' : 'Create New Room' ])
+        ]) : null
       ])
     ])
   )
 }
 
-function renderChat(messages, me) {
+function renderChat(props) {
+  var height = window.innerHeight - 300;
+  var element = document.getElementById('messages');
+  var scrollTop = util.propHook(function(node) {
+    setTimeout(function() {
+      node.scrollTop = node.scrollHeight;
+    }, 100);
+  });
+  var messages = props.messages;
   return (
     h("div#main.col-md-9", [
-      h("div#messages", [
+      h("div#messages", { scrollTop: scrollTop, style: { height: height+'px' } }, [
         h("table", messages.map(function(message) {
-          var classes = '.message';
-          classes += '.'+message.kind;
-          if(message.user == me) {
-            classes += '.me';
-          }
+          var classes = cx('message', message.kind, {
+            me: message.user === props.username
+          });
           return h("tr"+classes, [
             h("td.user", [ message.user ]),
             h("td", [ message.message ])
           ]);
-        })),
-        h("input#talk.form-control", {
-            "type": "text",
-            "ng-model": "text",
-            "ng-keypress": "onType($event)"
-        })
-      ])
+        }))
+      ]),
+      h("input#talk.form-control", {
+          "type": "text",
+          "value": props.chat
+      })
     ])
   )
 }
@@ -82,8 +85,7 @@ function renderSidebar() {
         h("h3", {
             "ng-show": "game.isPlayer()"
         }, [ "you are the giver" ]),
-        h("h3", {
-            "ng-show": "game.isMonitor()"
+        h("h3", { "ng-show": "game.isMonitor()"
         }, [ "you are a monitor" ]),
         h("h3", {
             "ng-show": "game.isGuesser()"
@@ -128,25 +130,24 @@ function renderSidebar() {
   )
 }
 
-function renderMain() {
+function renderMain(props) {
   return h("div.row", [
-    renderChat(),
-    renderSideBar()
+    renderChat(props)
   ])
 }
 
-module.exports = function() {
-  var isConnected = false;
+module.exports = function(props) {
+  var isConnected = props.status === 'connected';
   return (
     h("div", [
       h("div.page-header", [
         h("h1", isConnected ?
-          [ "Welcome ", h("small", [ "You are playing as {{service.username}}" ]) ]
+          [ "Welcome ", h("small", [ "You are playing as "+props.username ]) ]
           :
           [ "Welcome ", h("small", [ "login to play" ]) ]
          )
       ]),
-      isConnected ? renderMain() : renderLogin()
+      isConnected ? renderMain(props) : renderLogin(props)
     ])
   );
 }
