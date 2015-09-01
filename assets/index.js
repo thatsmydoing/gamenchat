@@ -16,6 +16,7 @@ var nav = [
 function intent(drivers) {
   var DOM = drivers.DOM;
   return {
+    contribute: require('./intents/contribute')(drivers),
     route$: drivers.hash.map(function(route) {
       return route || 'about';
     }),
@@ -117,7 +118,7 @@ function model(actions) {
       status$: results.status$,
       error$: results.error$,
       chat$: input$,
-      messages$: messages$
+      contribute$: actions.contribute.fields$
     }
   };
 }

@@ -35,13 +35,55 @@ function log(label) {
   return _.bind(console.log, console, label);
 }
 
+function flatten(obj) {
+  var ret = {};
+  _.forEach(obj, function(val, key) {
+    if(_.isPlainObject(val)) {
+      var o = flatten(val);
+      _.forEach(o, function(val, innerKey) {
+        ret[key+'.'+innerKey] = val;
+      });
+    }
+    else {
+      ret[key] = val;
+    }
+  });
+  return ret;
+}
+
+function _set(obj, key, val) {
+  var pos = key.indexOf('.');
+  if(pos < 0) {
+    obj[key] = val;
+  }
+  else {
+    var parent = key.substr(0, pos);
+    if(!obj[parent]) {
+      obj[parent] = {};
+    }
+
+    var rest = key.substr(pos+1);
+    _set(obj[parent], rest, val);
+  }
+}
+
+function unflatten(obj) {
+  var ret = {};
+  var set = _.bind(_set, null, ret);
+  _.forEach(obj, function(val, key) {
+    set(key, val);
+  });
+  return ret;
+}
+
 function asObject(params) {
+  params = flatten(params);
   var keys = _.keys(params).map(function(key) {
     return key.replace(/\$$/, '');
   });
   var vals = _.values(params);
   return Rx.Observable.combineLatest(vals, function() {
-    return _.zipObject(keys, arguments);
+    return unflatten(_.zipObject(keys, arguments));
   });
 }
 

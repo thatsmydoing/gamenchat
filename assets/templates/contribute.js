@@ -1,6 +1,6 @@
 var h = require('cyclejs').h;
 
-module.exports = function() {
+module.exports = function(props) {
   var submitting = false;
   var exists = false;
   var thanks = false;
@@ -16,56 +16,28 @@ h("div", [
         "Help make the game! Contribute words and make the game better. Also, please ",
         "original work only. Don't just blindly copy a card from any of the Taboo games."
       ]),
-      h("form#cardForm", {
-          "role": "form",
-          "ng-submit": "submit()"
-      }, [
+      h("form#cardForm", { "role": "form" }, [
         h("div.form-group", [
-          h("label", {
-              "for": "inputWord"
-          }, [ "Word" ]),
+          h("label", { "htmlFor": "inputWord" }, [ "Word" ]),
           h("input#inputWord.form-control", {
               "type": "text",
-              "ng-model": "card.word",
               "placeholder": "Word",
-              "ng-change": "check()",
-              "required": ""
+              "required": "true"
           }),
           exists ? h("span", [ "We already have this word" ]) : null
         ]),
-        h("div.form-group", [
-          h("label", [ "Taboo Words" ]),
-          h("input.form-control", {
-              "type": "text",
-              "ng-model": "card.taboos[0]",
-              "placeholder": "Taboo Word",
-              "required": ""
-          }),
-          h("input.form-control", {
-              "type": "text",
-              "ng-model": "card.taboos[1]",
-              "placeholder": "Taboo Word",
-              "required": ""
-          }),
-          h("input.form-control", {
-              "type": "text",
-              "ng-model": "card.taboos[2]",
-              "placeholder": "Taboo Word",
-              "required": ""
-          }),
-          h("input.form-control", {
-              "type": "text",
-              "ng-model": "card.taboos[3]",
-              "placeholder": "Taboo Word",
-              "required": ""
-          }),
-          h("input.form-control", {
-              "type": "text",
-              "ng-model": "card.taboos[4]",
-              "placeholder": "Taboo Word",
-              "required": ""
-          })
-        ]),
+        h("div.form-group",
+          [ h("label", [ "Taboo Words" ]) ]
+          .concat([0,1,2,3,4].map(function(item) {
+            return h('input.form-control', {
+              id: 'taboo'+item,
+              type: 'text',
+              placeholder: 'Taboo Word',
+              value: props.contribute['taboo'+item],
+              required: true
+            });
+          }))
+        ),
         h("input.btn.btn-primary", {
             "disabled": submitting,
             "type": "submit",
