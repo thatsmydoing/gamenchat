@@ -11,10 +11,14 @@ import models._
 
 object Cards extends Controller {
 
-  val cardForm = Form(mapping(
+  val cardMapping = mapping(
     "word" -> text,
-    "taboos" -> seq(text).transform(_.toSet, (set: Set[String]) => set.toSeq)
-  )(Card.apply)(Card.unapply))
+    "taboo" -> seq(text).transform(_.toSet, (set: Set[String]) => set.toSeq)
+  )(Card.apply)(Card.unapply)
+
+  val cardForm = Form(cardMapping)
+
+  val cardsForm = Form(seq(cardMapping))
 
   def add = Action(parse.json) { implicit request =>
     cardForm.bindFromRequest.fold(
@@ -31,6 +35,18 @@ object Cards extends Controller {
       "word" -> word,
       "exists" -> Card.exists(word)
     ))
+  }
+
+  def load = Action(parse.json) { implicit request =>
+    cardsForm.bindFromRequest.fold(
+      { case error => BadRequest("invalid format") },
+      { case cards =>
+        cards.foreach { card =>
+          Card.add(card)
+        }
+        Ok("ok")
+      }
+    )
   }
 
   def dump = Action {

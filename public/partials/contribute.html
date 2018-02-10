@@ -17,11 +17,11 @@
         </div>
         <div class="form-group">
           <label>Taboo Words</label>
-          <input type="text" class="form-control" ng-model="card.taboos[0]" placeholder="Taboo Word" required>
-          <input type="text" class="form-control" ng-model="card.taboos[1]" placeholder="Taboo Word" required>
-          <input type="text" class="form-control" ng-model="card.taboos[2]" placeholder="Taboo Word" required>
-          <input type="text" class="form-control" ng-model="card.taboos[3]" placeholder="Taboo Word" required>
-          <input type="text" class="form-control" ng-model="card.taboos[4]" placeholder="Taboo Word" required>
+          <input type="text" class="form-control" ng-model="card.taboo[0]" placeholder="Taboo Word" required>
+          <input type="text" class="form-control" ng-model="card.taboo[1]" placeholder="Taboo Word" required>
+          <input type="text" class="form-control" ng-model="card.taboo[2]" placeholder="Taboo Word" required>
+          <input type="text" class="form-control" ng-model="card.taboo[3]" placeholder="Taboo Word" required>
+          <input type="text" class="form-control" ng-model="card.taboo[4]" placeholder="Taboo Word" required>
         </div>
         <input ng-disabled="submitting" class="btn btn-primary" type="submit" value="{{submitting ? 'Submitting...' : 'Submit'}}">
         <span ng-show="thanks">Thank you!</span>

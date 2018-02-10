@@ -10,6 +10,7 @@ GET     /stats                           controllers.Application.stats
 
 GET     /cards                           controllers.Cards.dump
 POST    /cards                           controllers.Cards.add
+PUT     /cards                           controllers.Cards.load
 GET     /cards/random                    controllers.Cards.random
 GET     /cards/exists                    controllers.Cards.exists(word: String)
 
