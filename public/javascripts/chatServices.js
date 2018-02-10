@@ -52,8 +52,8 @@ angular.module('chatServices', [])
     service.status = 'connecting';
 
     var url = jsRoutes.controllers.Application.chat(username, getRoom()).webSocketURL();
-    if(window.location.hostname == "gamenchat.pleasantprogrammer.com" && window.location.port == "") {
-      url = url.replace("gamenchat.pleasantprogrammer.com", "$&:8000");
+    if(window.location.protocol == 'https:') {
+      url = url.replace('ws:', 'wss:');
     }
     chatSocket = new WS(url);
     chatSocket.onmessage = wrap(function(event) {
