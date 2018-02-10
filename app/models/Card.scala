@@ -26,14 +26,15 @@ object Card {
   }
 
   def add(card: Card) = DB.withTransaction { implicit c =>
-    val id = SQL("insert into words values (default, {word})")
+    SQL("insert into words (word) values ({word})")
       .on('word -> card.word)
-      .executeInsert()
+      .execute()
+    val id = SQL("select last_insert_rowid()").singleOpt(int("last_insert_rowid()"))
     id.map { id =>
       card.taboo.map { word =>
-        SQL("insert into taboo values (default, {id}, {word})")
+        SQL("insert into taboo (word_id, word) values ({id}, {word})")
           .on('id -> id, 'word -> word)
-          .executeInsert()
+          .execute()
       }
     }
   }
